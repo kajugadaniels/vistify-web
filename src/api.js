@@ -34,6 +34,19 @@ webApiClient.interceptors.response.use(
     }
 );
 
+// -------------- Categories API --------------
+
+//  Fetch all categories with associated places
+export const getCategories = async () => {
+    try {
+        const response = await webApiClient.get('/categories/'); // Make sure this endpoint exists in Django
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
+
+
 // -------------- Tags API --------------
 
 // Fetch all tags with associated places
