@@ -29,18 +29,20 @@ const Sidebar = ({ onSearch, onFilterByCategory }) => {
             {/* Search Box */}
             <div className="single-widget search">
                 <h3>Search Place</h3>
-                <input
-                    type="text"
-                    placeholder="Search Here..."
-                    value={searchQuery}
-                    onChange={(e) => {
-                        setSearchQuery(e.target.value);
-                        onSearch(e.target.value);
-                    }}
-                />
-                <button type="submit">
-                    <i className="lni lni-search-alt"></i>
-                </button>
+                <form>
+                    <input
+                        type="text"
+                        placeholder="Search Here..."
+                        value={searchQuery}
+                        onChange={(e) => {
+                            setSearchQuery(e.target.value);
+                            onSearch(e.target.value);
+                        }}
+                    />
+                    <button type="submit">
+                        <i className="lni lni-search-alt"></i>
+                    </button>
+                </form>
             </div>
 
             {/* Categories List */}
