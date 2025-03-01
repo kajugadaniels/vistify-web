@@ -1,13 +1,11 @@
-import React, { useEffect, useState } from 'react';
-import { Sidebar } from '../components';
-import { getPlaces } from '../api.js';
+import React, { useEffect, useState } from "react";
+import { Sidebar } from "../components";
+import { getPlaces } from "../api.js";
 
 const Explore = () => {
     const [places, setPlaces] = useState([]);
     const [filteredPlaces, setFilteredPlaces] = useState([]);
     const [loading, setLoading] = useState(true);
-
-    // Pagination State
     const [currentPage, setCurrentPage] = useState(1);
     const placesPerPage = 7;
 
@@ -16,6 +14,7 @@ const Explore = () => {
             try {
                 const response = await getPlaces();
                 setPlaces(response.data);
+                setFilteredPlaces(response.data);
             } catch (error) {
                 console.error("Error fetching places:", error);
             } finally {
@@ -25,19 +24,39 @@ const Explore = () => {
         fetchPlaces();
     }, []);
 
-    // Determine current places to display
-    const displayedPlaces = filteredPlaces.length > 0 ? filteredPlaces : places;
+    // Handle live search
+    const handleSearch = (query) => {
+        if (query.length > 0) {
+            const searchedPlaces = places.filter((place) =>
+                place.name.toLowerCase().includes(query.toLowerCase())
+            );
+            setFilteredPlaces(searchedPlaces);
+        } else {
+            setFilteredPlaces(places);
+        }
+    };
+
+    // Handle category filter
+    const handleFilterByCategory = (categoryId) => {
+        if (!categoryId) {
+            setFilteredPlaces(places);
+        } else {
+            const filtered = places.filter((place) => place.category_detail?.id === categoryId);
+            setFilteredPlaces(filtered);
+        }
+        setCurrentPage(1); // Reset pagination
+    };
+
+    // Pagination logic
     const indexOfLastPlace = currentPage * placesPerPage;
     const indexOfFirstPlace = indexOfLastPlace - placesPerPage;
-    const currentPlaces = displayedPlaces.slice(indexOfFirstPlace, indexOfLastPlace);
-
-    // Handle page change
+    const currentPlaces = filteredPlaces.slice(indexOfFirstPlace, indexOfLastPlace);
     const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
     return (
         <div className="row">
             <div className="col-lg-3 col-12">
-                <Sidebar onSearch={setFilteredPlaces} />
+                <Sidebar onSearch={handleSearch} onFilterByCategory={handleFilterByCategory} />
             </div>
             <div className="col-lg-9 col-12">
                 <div className="product-grids-head">
@@ -55,7 +74,7 @@ const Explore = () => {
                                         <option>Z - A Order</option>
                                     </select>
                                     <h3 className="total-show-product">
-                                        Showing: <span>{currentPlaces.length} of {displayedPlaces.length} places</span>
+                                        Showing: <span>{currentPlaces.length} of {filteredPlaces.length} places</span>
                                     </h3>
                                 </div>
                             </div>
@@ -74,7 +93,11 @@ const Explore = () => {
                                                     <div className="col-lg-4 col-md-4 col-12">
                                                         <div className="product-image">
                                                             <img
-                                                                src={place.images.length > 0 ? place.images[0].image : 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d1/Image_not_available.png/800px-Image_not_available.png'}
+                                                                src={
+                                                                    place.images.length > 0
+                                                                        ? place.images[0].image
+                                                                        : "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d1/Image_not_available.png/800px-Image_not_available.png"
+                                                                }
                                                                 alt={place.name}
                                                             />
                                                             <div className="button">
@@ -112,38 +135,26 @@ const Explore = () => {
                                     ))}
                                 </div>
                             )}
-
                             {/* Pagination */}
                             <div className="row">
                                 <div className="col-12">
                                     <div className="pagination left">
                                         <ul className="pagination-list">
-                                            {Array.from({ length: Math.ceil(displayedPlaces.length / placesPerPage) }).map((_, index) => (
+                                            {Array.from({ length: Math.ceil(filteredPlaces.length / placesPerPage) }).map((_, index) => (
                                                 <li key={index}>
-                                                    <a
-                                                        href="#"
-                                                        className={currentPage === index + 1 ? "active" : ""}
+                                                    <a href="#" className={currentPage === index + 1 ? "active" : ""}
                                                         onClick={(e) => {
                                                             e.preventDefault();
                                                             paginate(index + 1);
-                                                        }}
-                                                    >
+                                                        }}>
                                                         {index + 1}
                                                     </a>
                                                 </li>
                                             ))}
-                                            {currentPage < Math.ceil(displayedPlaces.length / placesPerPage) && (
-                                                <li>
-                                                    <a href="#" onClick={(e) => { e.preventDefault(); paginate(currentPage + 1); }}>
-                                                        <i className="lni lni-chevron-right"></i>
-                                                    </a>
-                                                </li>
-                                            )}
                                         </ul>
                                     </div>
                                 </div>
                             </div>
-                            {/* End Pagination */}
                         </div>
                     </div>
                 </div>
