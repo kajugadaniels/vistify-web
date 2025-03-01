@@ -1,11 +1,13 @@
 import React from 'react'
 import { Outlet } from 'react-router-dom'
+import { Footer, Header } from '../components'
 
 const AppLayout = () => {
     return (
         <div>
-            AppLayout
+            <Header />
             <Outlet />
+            <Footer />
         </div>
     )
 }
