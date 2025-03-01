@@ -6,7 +6,11 @@ const AppLayout = () => {
     return (
         <div>
             <Header />
-            <Outlet />
+            <section className="product-grids section">
+                <div className="container">
+                    <Outlet />
+                </div>
+            </section>
             <Footer />
         </div>
     )
