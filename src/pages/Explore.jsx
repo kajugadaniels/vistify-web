@@ -74,7 +74,7 @@ const Explore = () => {
                                                     <div className="col-lg-4 col-md-4 col-12">
                                                         <div className="product-image">
                                                             <img
-                                                                src={place.images.length > 0 ? place.images[0].image : 'https://via.placeholder.com/300'}
+                                                                src={place.images.length > 0 ? place.images[0].image : 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d1/Image_not_available.png/800px-Image_not_available.png'}
                                                                 alt={place.name}
                                                             />
                                                             <div className="button">
