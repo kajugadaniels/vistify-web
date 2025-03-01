@@ -5,6 +5,7 @@ import { getPlaces } from '../api.js';
 const Explore = () => {
     const [places, setPlaces] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [filteredPlaces, setFilteredPlaces] = useState([]);
 
     useEffect(() => {
         const fetchPlaces = async () => {
@@ -24,7 +25,7 @@ const Explore = () => {
     return (
         <div className="row">
             <div className="col-lg-3 col-12">
-                <Sidebar />
+                <Sidebar onSearch={setFilteredPlaces} />
             </div>
             <div className="col-lg-9 col-12">
                 <div className="product-grids-head">
@@ -54,7 +55,7 @@ const Explore = () => {
                                 <div className="text-center">Loading places...</div>
                             ) : (
                                 <div className="row">
-                                    {places.map((place) => (
+                                    {(filteredPlaces.length > 0 ? filteredPlaces : places).map((place) => (
                                         <div key={place.id} className="col-lg-12 col-md-12 col-12">
                                             <div className="single-product">
                                                 <div className="row align-items-center">
