@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Sidebar } from "../components";
-import { getPlaces } from "../api.js";
+import { getPlaces, MEDIA_BASE_URL } from "../api.js";
 
 const Explore = () => {
     const [places, setPlaces] = useState([]);
@@ -93,11 +93,9 @@ const Explore = () => {
                                                     <div className="col-lg-4 col-md-4 col-12">
                                                         <div className="product-image">
                                                             <img
-                                                                src={
-                                                                    place.images.length > 0
-                                                                        ? place.images[0].image
-                                                                        : "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d1/Image_not_available.png/800px-Image_not_available.png"
-                                                                }
+                                                                src={place.images.length > 0 
+                                                                    ? `${MEDIA_BASE_URL}${place.images[0].image}` 
+                                                                    : 'https://upload.wikimedia.org/wikipedia/commons/d/d1/Image_not_available.png'}
                                                                 alt={place.name}
                                                             />
                                                             <div className="button">
