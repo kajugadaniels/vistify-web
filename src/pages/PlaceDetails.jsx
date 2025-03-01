@@ -1,6 +1,41 @@
-import React from 'react'
+import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import { placeDetails } from "../api.js";
 
 const PlaceDetails = () => {
+    const { id } = useParams(); // Get place ID from URL
+    const [place, setPlace] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [mainImage, setMainImage] = useState("");
+
+    useEffect(() => {
+        const fetchPlaceDetails = async () => {
+            try {
+                const response = await placeDetails(id);
+                setPlace(response.data);
+                if (response.data.images.length > 0) {
+                    setMainImage(response.data.images[0].image);
+                }
+            } catch (error) {
+                console.error("Error fetching place details:", error);
+                setError("Failed to load place details. Please try again.");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchPlaceDetails();
+    }, [id]);
+
+    if (loading) {
+        return <div className="text-center">Loading place details...</div>;
+    }
+
+    if (error) {
+        return <div className="alert alert-danger text-center">{error}</div>;
+    }
+
     return (
         <>
             <section className="item-details">
@@ -10,43 +45,60 @@ const PlaceDetails = () => {
                             <div className="col-lg-6 col-md-12 col-12">
                                 <div className="product-images">
                                     <main id="gallery">
+                                        {/* Main Image */}
                                         <div className="main-img">
-                                            <img src="https://www.kcc.rw/uploads/9/8/2/4/98249186/dome-business-class-lounge_orig.jpg" id="current" alt="#" />
+                                            <img src={mainImage || "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d1/Image_not_available.png/800px-Image_not_available.png"} id="current" alt={place.name} />
                                         </div>
+                                        {/* Thumbnails */}
                                         <div className="images">
-                                            <img src="https://www.kcc.rw/uploads/9/8/2/4/98249186/dome-business-class-lounge_orig.jpg" className="img" alt="#" />
+                                            {place.images.length > 0 ? (
+                                                place.images.map((img, index) => (
+                                                    <img
+                                                        key={index}
+                                                        src={img.image}
+                                                        className="img"
+                                                        alt={`Image ${index + 1}`}
+                                                        onClick={() => setMainImage(img.image)}
+                                                    />
+                                                ))
+                                            ) : (
+                                                <p>No images available</p>
+                                            )}
                                         </div>
                                     </main>
                                 </div>
                             </div>
                             <div className="col-lg-6 col-md-12 col-12">
                                 <div className="product-info">
-                                    <h2 className="title">
-                                        Pili Pili
-                                    </h2>
+                                    <h2 className="title">{place.name}</h2>
                                     <p className="category">
-                                        <i className="lni lni-tag"></i>
-                                        Category:
-                                        <a href="javascript:void(0)">
-                                            Bar
-                                        </a>
+                                        <i className="lni lni-tag"></i> Category:{" "}
+                                        <a href="#">{place.category_detail?.name || "Uncategorized"}</a>
                                     </p>
+                                    <p>
+                                        <strong>Address:</strong> {place.address || "Not provided"}
+                                    </p>
+                                    <p>
+                                        <strong>Location:</strong> {place.province}, {place.district}, {place.sector}, {place.cell}, {place.village}
+                                    </p>
+                                    <p className="info-text">{place.description}</p>
                                     <h3 className="price">
-                                        2507888888888
+                                        {place.social_medias?.phone_number || "No contact available"}
                                     </h3>
-                                    <p className="info-text">
-                                        Description here
-                                    </p>
                                     <div className="bottom-content">
                                         <div className="row align-items-end">
                                             <div className="col-lg-4 col-md-4 col-12">
                                                 <div className="wish-button">
-                                                    <button className="btn"><i className="lni lni-reload"></i> Find Location</button>
+                                                    <button className="btn">
+                                                        <i className="lni lni-reload"></i> Find Location
+                                                    </button>
                                                 </div>
                                             </div>
                                             <div className="col-lg-4 col-md-4 col-12">
                                                 <div className="wish-button">
-                                                    <button className="btn"><i className="lni lni-heart"></i> To Wishlist</button>
+                                                    <button className="btn">
+                                                        <i className="lni lni-heart"></i> Add to Wishlist
+                                                    </button>
                                                 </div>
                                             </div>
                                         </div>
@@ -55,31 +107,36 @@ const PlaceDetails = () => {
                             </div>
                         </div>
                     </div>
+
+                    {/* Place Details */}
                     <div className="product-details-info">
                         <div className="single-block">
                             <div className="row">
                                 <div className="col-lg-12 col-12">
                                     <div className="info-body custom-responsive-margin">
                                         <h4>Details</h4>
-                                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
-                                            incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
-                                            exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute
-                                            irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat.
-                                        </p>
+                                        <p>{place.description || "No additional details provided."}</p>
                                     </div>
                                 </div>
+                                {/* Tags */}
                                 <div className="col-lg-12 col-12">
                                     <div className="info-body">
-                                        <div className="col-lg-4">
-                                            <h4>Menu</h4>
-                                            <ul className="normal-list">
-                                                <li><span>Glass of Wine:</span> 6k</li>
-                                            </ul>
-                                        </div>
+                                        <h4>Tags</h4>
+                                        <ul className="normal-list">
+                                            {place.tags_detail.length > 0 ? (
+                                                place.tags_detail.map((tag) => (
+                                                    <li key={tag.id}>{tag.name}</li>
+                                                ))
+                                            ) : (
+                                                <li>No tags available</li>
+                                            )}
+                                        </ul>
                                     </div>
                                 </div>
                             </div>
                         </div>
+
+                        {/* Reviews Section */}
                         <div className="row">
                             <div className="col-lg-4 col-12">
                                 <div className="single-block give-review">
@@ -101,33 +158,8 @@ const PlaceDetails = () => {
                                             <i className="lni lni-star-filled"></i>
                                             <i className="lni lni-star"></i>
                                         </li>
-                                        <li>
-                                            <span>3 stars - 3</span>
-                                            <i className="lni lni-star-filled"></i>
-                                            <i className="lni lni-star-filled"></i>
-                                            <i className="lni lni-star-filled"></i>
-                                            <i className="lni lni-star"></i>
-                                            <i className="lni lni-star"></i>
-                                        </li>
-                                        <li>
-                                            <span>2 stars - 1</span>
-                                            <i className="lni lni-star-filled"></i>
-                                            <i className="lni lni-star-filled"></i>
-                                            <i className="lni lni-star"></i>
-                                            <i className="lni lni-star"></i>
-                                            <i className="lni lni-star"></i>
-                                        </li>
-                                        <li>
-                                            <span>1 star - 0</span>
-                                            <i className="lni lni-star-filled"></i>
-                                            <i className="lni lni-star"></i>
-                                            <i className="lni lni-star"></i>
-                                            <i className="lni lni-star"></i>
-                                            <i className="lni lni-star"></i>
-                                        </li>
                                     </ul>
-                                    <button type="button" className="btn review-btn" data-bs-toggle="modal"
-                                        data-bs-target="#exampleModal">
+                                    <button type="button" className="btn review-btn">
                                         Leave a Review
                                     </button>
                                 </div>
@@ -137,7 +169,7 @@ const PlaceDetails = () => {
                 </div>
             </section>
         </>
-    )
-}
+    );
+};
 
-export default PlaceDetails
+export default PlaceDetails;
