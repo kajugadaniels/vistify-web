@@ -45,3 +45,15 @@ export const getTags = async () => {
         throw error;
     }
 };
+
+// -------------- Places API --------------
+
+// Fetch all places with detailed information (category, tags, images, social media)
+export const getPlaces = async () => {
+    try {
+        const response = await webApiClient.get('/web/places/');
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
