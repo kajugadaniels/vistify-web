@@ -1,9 +1,16 @@
 import axios from 'axios';
 
+// Set API Base URL
 const baseURL =
     import.meta.env.MODE === 'production'
         ? import.meta.env.VITE_API_BASE_URL_PROD
         : import.meta.env.VITE_API_BASE_URL;
+
+// Set Media Base URL
+export const MEDIA_BASE_URL =
+    import.meta.env.MODE === 'production'
+        ? import.meta.env.VITE_MEDIA_BASE_URL_PROD
+        : import.meta.env.VITE_MEDIA_BASE_URL;
 
 const webApiClient = axios.create({
     baseURL,
