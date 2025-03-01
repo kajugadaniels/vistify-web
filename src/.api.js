@@ -39,7 +39,7 @@ webApiClient.interceptors.response.use(
 // Fetch all tags with associated places
 export const getTags = async () => {
     try {
-        const response = await webApiClient.get('/web/tags/');
+        const response = await webApiClient.get('/tags/');
         return response.data;
     } catch (error) {
         throw error;
@@ -51,7 +51,17 @@ export const getTags = async () => {
 // Fetch all places with detailed information (category, tags, images, social media)
 export const getPlaces = async () => {
     try {
-        const response = await webApiClient.get('/web/places/');
+        const response = await webApiClient.get('/places/');
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
+
+// Fetch details for a specific place
+export const placeDetails = async (placeId) => {
+    try {
+        const response = await webApiClient.get(`/place/${placeId}/`);
         return response.data;
     } catch (error) {
         throw error;
