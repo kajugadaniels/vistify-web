@@ -27,10 +27,16 @@ const PlaceDetails = () => {
         const fetchPlaceDetails = async () => {
             try {
                 const response = await placeDetails(id);
-                setPlace(response.data);
+                
+                // ✅ Fix: Ensure we access the correct nested structure
+                if (response?.data?.place) {
+                    setPlace(response.data.place);
 
-                if (response.data?.images?.length > 0) {
-                    setMainImage(`${MEDIA_BASE_URL}${response.data.images[0].image}`);
+                    if (response.data.place.images?.length > 0) {
+                        setMainImage(`${MEDIA_BASE_URL}${response.data.place.images[0].image}`);
+                    }
+                } else {
+                    throw new Error("Invalid data structure received");
                 }
             } catch (error) {
                 console.error("Error fetching place details:", error);
@@ -122,37 +128,19 @@ const PlaceDetails = () => {
                                     <h3 className="price">
                                         {place?.social_medias?.phone_number || "No contact available"}
                                     </h3>
-
+                                    <p className="info-text">{place?.description}</p>
                                     {/* QR Code for Food Menu */}
-                                    <div className="text-center mt-4">
-                                        <h4>View Food & Drinks Menu</h4>
+                                    <div className="mt-4">
                                         <div ref={qrCodeRef} className="d-inline-block p-2 border rounded bg-light">
                                             <QRCode value={menuUrl} size={128} />
                                         </div>
                                         <p className="text-muted">Scan to view the menu</p>
-                                        <button className="btn btn-primary mx-2" onClick={downloadQRCode}>Download QR Code</button>
-                                        <Link to={`/place/${id}/menu`} className="btn btn-outline-primary">View Menu</Link>
+                                        {/*<div className="wish-button">
+                                            <Link className="btn" to={`/place/${id}/menu`}>
+                                                <i className="lni lni-reload"></i> View Menu
+                                            </Link>
+                                        </div>*/}
                                     </div>
-
-                                    <div className="bottom-content">
-                                        <div className="row align-items-end">
-                                            <div className="col-lg-4 col-md-4 col-12">
-                                                <div className="wish-button">
-                                                    <button className="btn">
-                                                        <i className="lni lni-reload"></i> Find Location
-                                                    </button>
-                                                </div>
-                                            </div>
-                                            <div className="col-lg-4 col-md-4 col-12">
-                                                <div className="wish-button">
-                                                    <button className="btn">
-                                                        <i className="lni lni-heart"></i> Add to Wishlist
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
                                 </div>
                             </div>
                         </div>
