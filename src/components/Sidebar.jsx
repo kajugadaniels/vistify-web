@@ -43,13 +43,15 @@ const Sidebar = ({ onSearch }) => {
         <div className="product-sidebar">
             <div className="single-widget search">
                 <h3>Search Place</h3>
-                <input
-                    type="text"
-                    placeholder="Search Here..."
-                    value={searchQuery}
-                    onChange={handleSearch}
-                />
-                <button type="submit"><i className="lni lni-search-alt"></i></button>
+                <form action="#">
+                    <input
+                        type="text"
+                        placeholder="Search Here..."
+                        value={searchQuery}
+                        onChange={handleSearch}
+                    />
+                    <button type="submit"><i className="lni lni-search-alt"></i></button>
+                </form>
             </div>
             <div className="single-widget">
                 <h3>All Categories</h3>
@@ -58,7 +60,6 @@ const Sidebar = ({ onSearch }) => {
                         categories.map((category) => (
                             <li key={category.id}>
                                 <a href="#">{category.name}</a>
-                                <span>({category.places ? category.places.length : 0})</span>
                             </li>
                         ))
                     ) : (
