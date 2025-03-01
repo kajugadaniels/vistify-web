@@ -4,8 +4,12 @@ import { getPlaces } from '../api.js';
 
 const Explore = () => {
     const [places, setPlaces] = useState([]);
-    const [loading, setLoading] = useState(true);
     const [filteredPlaces, setFilteredPlaces] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    // Pagination State
+    const [currentPage, setCurrentPage] = useState(1);
+    const placesPerPage = 7;
 
     useEffect(() => {
         const fetchPlaces = async () => {
@@ -18,9 +22,17 @@ const Explore = () => {
                 setLoading(false);
             }
         };
-
         fetchPlaces();
     }, []);
+
+    // Determine current places to display
+    const displayedPlaces = filteredPlaces.length > 0 ? filteredPlaces : places;
+    const indexOfLastPlace = currentPage * placesPerPage;
+    const indexOfFirstPlace = indexOfLastPlace - placesPerPage;
+    const currentPlaces = displayedPlaces.slice(indexOfFirstPlace, indexOfLastPlace);
+
+    // Handle page change
+    const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
     return (
         <div className="row">
@@ -43,7 +55,7 @@ const Explore = () => {
                                         <option>Z - A Order</option>
                                     </select>
                                     <h3 className="total-show-product">
-                                        Showing: <span>{places.length} items</span>
+                                        Showing: <span>{currentPlaces.length} of {displayedPlaces.length} places</span>
                                     </h3>
                                 </div>
                             </div>
@@ -55,7 +67,7 @@ const Explore = () => {
                                 <div className="text-center">Loading places...</div>
                             ) : (
                                 <div className="row">
-                                    {(filteredPlaces.length > 0 ? filteredPlaces : places).map((place) => (
+                                    {currentPlaces.map((place) => (
                                         <div key={place.id} className="col-lg-12 col-md-12 col-12">
                                             <div className="single-product">
                                                 <div className="row align-items-center">
@@ -100,19 +112,38 @@ const Explore = () => {
                                     ))}
                                 </div>
                             )}
+
+                            {/* Pagination */}
                             <div className="row">
                                 <div className="col-12">
                                     <div className="pagination left">
                                         <ul className="pagination-list">
-                                            <li><a href="#">1</a></li>
-                                            <li className="active"><a href="#">2</a></li>
-                                            <li><a href="#">3</a></li>
-                                            <li><a href="#">4</a></li>
-                                            <li><a href="#"><i className="lni lni-chevron-right"></i></a></li>
+                                            {Array.from({ length: Math.ceil(displayedPlaces.length / placesPerPage) }).map((_, index) => (
+                                                <li key={index}>
+                                                    <a
+                                                        href="#"
+                                                        className={currentPage === index + 1 ? "active" : ""}
+                                                        onClick={(e) => {
+                                                            e.preventDefault();
+                                                            paginate(index + 1);
+                                                        }}
+                                                    >
+                                                        {index + 1}
+                                                    </a>
+                                                </li>
+                                            ))}
+                                            {currentPage < Math.ceil(displayedPlaces.length / placesPerPage) && (
+                                                <li>
+                                                    <a href="#" onClick={(e) => { e.preventDefault(); paginate(currentPage + 1); }}>
+                                                        <i className="lni lni-chevron-right"></i>
+                                                    </a>
+                                                </li>
+                                            )}
                                         </ul>
                                     </div>
                                 </div>
                             </div>
+                            {/* End Pagination */}
                         </div>
                     </div>
                 </div>
