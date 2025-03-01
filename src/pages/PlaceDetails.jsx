@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { placeDetails } from "../api.js";
+import { placeDetails, MEDIA_BASE_URL } from "../api.js";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
@@ -22,7 +22,7 @@ const PlaceDetails = () => {
                 const response = await placeDetails(id);
                 setPlace(response.data);
                 if (response.data.images.length > 0) {
-                    setMainImage(response.data.images[0].image);
+                    setMainImage(`${MEDIA_BASE_URL}${response.data.images[0].image}`);
                 }
             } catch (error) {
                 console.error("Error fetching place details:", error);
@@ -43,7 +43,7 @@ const PlaceDetails = () => {
         return <div className="alert alert-danger text-center">{error}</div>;
     }
 
-    const position = [place.latitude, place.longitude];
+    const position = place.latitude && place.longitude ? [place.latitude, place.longitude] : null;
 
     return (
         <>
@@ -56,7 +56,11 @@ const PlaceDetails = () => {
                                     <main id="gallery">
                                         {/* Main Image */}
                                         <div className="main-img">
-                                            <img src={mainImage || "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d1/Image_not_available.png/800px-Image_not_available.png"} id="current" alt={place.name} />
+                                            <img 
+                                                src={mainImage || "https://upload.wikimedia.org/wikipedia/commons/d/d1/Image_not_available.png"} 
+                                                id="current" 
+                                                alt={place.name} 
+                                            />
                                         </div>
                                         {/* Thumbnails */}
                                         <div className="images">
@@ -64,10 +68,10 @@ const PlaceDetails = () => {
                                                 place.images.map((img, index) => (
                                                     <img
                                                         key={index}
-                                                        src={img.image}
+                                                        src={`${MEDIA_BASE_URL}${img.image}`}
                                                         className="img"
                                                         alt={`Image ${index + 1}`}
-                                                        onClick={() => setMainImage(img.image)}
+                                                        onClick={() => setMainImage(`${MEDIA_BASE_URL}${img.image}`)}
                                                     />
                                                 ))
                                             ) : (
@@ -149,7 +153,7 @@ const PlaceDetails = () => {
                             <div className="single-block">
                                 <div className="row">
                                     {/* OpenStreetMap Location */}
-                                    {place.latitude && place.longitude ? (
+                                    {position ? (
                                         <div className="row">
                                             <div className="col-lg-12">
                                                 <h4 className="pb-4">Location on Map</h4>
